@@ -1,5 +1,4 @@
 venv
-config.py
 credentials.json
-gitignore
-env
+.gitignore
+.env
