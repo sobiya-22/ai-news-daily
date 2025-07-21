@@ -2,8 +2,8 @@ name: Weekly Python Script
 
 on:
   schedule:
-    - cron: '30 4 * * *'  # Every Wednesday at 7:30 AM IST (2:00 UTC)
-  workflow_dispatch:  # Optional: allows manual trigger
+    - cron: '30 4 * * *' 
+  workflow_dispatch: 
 
 jobs:
   run:
