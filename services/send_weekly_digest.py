@@ -28,9 +28,9 @@ def send_digest_email(digest_text: str):
             with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
                 server.login(EMAIL, APP_PASSWORD)
                 server.send_message(msg)
-                print(f"✅ Digest sent to {recipient}")
+                print(f"Digest sent to {recipient}")
         except Exception as e:
-            print(f"❌ Failed to send to {recipient}: {e}")
+            print(f"Failed to send to {recipient}: {e}")
 
 def format_digest_as_html(digest_text: str) -> str:
     digest_html = digest_text.replace("**", "<b>").replace("\n\n", "<br><br>").replace("\n- ", "<li>").replace("\n", "<br>")

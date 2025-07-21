@@ -2,6 +2,7 @@ from google.cloud import bigquery
 from datetime import date
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 load_dotenv()
 
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -68,7 +69,6 @@ def fetch_enhanced_news():
         } for row in results]
 
 
-from datetime import datetime
 
 def upload_subscriber_email(email):
     table_id = f"{PROJECT_ID}.{DATASET_ID}.subscribers"
