@@ -1,16 +1,26 @@
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+
+# Load environment variables
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_APIKEY"))
+# Get API key
+api_key = os.getenv("GEMINI_APIKEY")
+if not api_key:
+    raise EnvironmentError("GEMINI_APIKEY is not set in environment variables.")
+
+# Configure Gemini
+genai.configure(api_key=api_key)
 model = genai.GenerativeModel("gemini-2.5-pro")
 
+# Format articles
 def format_articles(articles):
     return "".join(
         f"\nTitle: {a['title']}\nContent: {a['content']}\nURL: {a['source_url']}\n---\n" for a in articles
     )
 
+# Generate news digest
 def generate_news_digest(featured, regular):
     prompt = f"""
     You are an intelligent, concise, and professional assistant tasked with generating a daily tech news digest suitable for email distribution. The digest should highlight the most important stories of the day in a clean and reader-friendly format.
@@ -39,5 +49,8 @@ def generate_news_digest(featured, regular):
     Ensure the overall tone is professional yet approachable, perfect for an early morning tech newsletter.
     """
 
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Error generating digest: {e}"
