@@ -94,3 +94,16 @@ def upload_subscriber_email(email):
             "success": False,
             "message": f"❌ Failed to subscribe {email}: {e}"
         }
+    
+def fetch_subscriber_emails():
+    query = f"""
+        SELECT email
+        FROM `{PROJECT_ID}.{DATASET_ID}.subscribers`
+    """
+    try:
+        result = bq_client.query(query)
+        emails = [row["email"] for row in result]
+        return emails
+    except Exception as e:
+        print(f"❌ Failed to fetch subscribers: {e}")
+        return []

@@ -8,6 +8,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 # from config import VENTUREBEAT_AI_URL
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from services.query_data import upload_articles_to_bigquery,fetch_articles_by_type, store_digest
 from services.enhance_content import generate_news_digest
 from dotenv import load_dotenv

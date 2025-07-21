@@ -3,17 +3,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import os
 from dotenv import load_dotenv
+from services.query_data import fetch_subscriber_emails
 
 load_dotenv()
 
 EMAIL = os.getenv("EMAIL")
 APP_PASSWORD = os.getenv("APP_PASSWORD")
 
-def load_subscribers(file_path="subscribers.txt"):
-    with open(file_path, "r") as f:
-        return [email.strip() for email in f.readlines() if email.strip()]
+recipients = fetch_subscriber_emails()
 
-def send_digest_email(digest_text: str, recipients: list):
+def send_digest_email(digest_text: str):
     html_digest = format_digest_as_html(digest_text)
     
     for recipient in recipients:
@@ -65,7 +64,3 @@ def format_digest_as_html(digest_text: str) -> str:
     </html>
     """
 
-# Example usage:
-# digest = "Your news digest here..."
-# subscribers = load_subscribers()
-# send_digest_email(digest, subscribers)
