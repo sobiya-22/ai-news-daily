@@ -1,16 +1,23 @@
 from google.cloud import bigquery
 from datetime import date
-# from config import PROJECT_ID, RAW_TABLE_ID, ENHANCED_TABLE_ID
 from dotenv import load_dotenv
 import os
 load_dotenv()
 
-bq_client = bigquery.Client(project=os.getenv("PROJECT_ID"))
+PROJECT_ID = os.getenv("PROJECT_ID")
+DATASET_ID = os.getenv("DATASET_ID")
+RAW_TABLE_NAME = os.getenv("RAW_TABLE_NAME")
+ENHANCED_TABLE_NAME = os.getenv("ENHANCED_TABLE_NAME")
+RAW_TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.{RAW_TABLE_NAME}"
+ENHANCED_TABLE_ID = f"{PROJECT_ID}.{DATASET_ID}.{ENHANCED_TABLE_NAME}"
+
+
+bq_client = bigquery.Client(project=PROJECT_ID)
 
 def fetch_articles_by_type(article_type):
     query = f"""
     SELECT title, content, source_url, scraped_at, article_type
-    FROM `{os.getenv("RAW_TABLE_ID")}`
+    FROM `{RAW_TABLE_ID}`
     WHERE DATE(scraped_at) = CURRENT_DATE() AND LOWER(article_type) = '{article_type.lower()}'
     """
     results = bq_client.query(query).result()
@@ -35,7 +42,7 @@ def store_digest(digest_text):
         source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON
     )
 
-    job = bq_client.load_table_from_json(data, os.getenv("ENHANCED_TABLE_ID"), job_config=job_config)
+    job = bq_client.load_table_from_json(data,ENHANCED_TABLE_ID, job_config=job_config)
     job.result()
     print(f"Digest uploaded to BigQuery: {len(data)} record(s)")
 
@@ -45,7 +52,17 @@ def upload_articles_to_bigquery(data):
         write_disposition="WRITE_APPEND",
         source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON
     )
-
-    job = bq_client.load_table_from_json(data, os.getenv("RAW_TABLE_ID"), job_config=job_config)
+    print("RAW_TABLE_ID =", RAW_TABLE_ID)
+    job = bq_client.load_table_from_json(data,RAW_TABLE_ID, job_config=job_config)
     job.result()
     print(f"Uploaded {len(data)} article(s) to BigQuery")
+
+def fetch_enhanced_news():
+    query=f"SELECT news_date, generated_news FROM `{ENHANCED_TABLE_ID}` WHERE news_date = CURRENT_DATE()"
+    results = bq_client.query(query).result()
+
+    return [
+        {
+            "news_date": row.news_date.isoformat(),
+            "generated_news": row.generated_news
+        } for row in results]

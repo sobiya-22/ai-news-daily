@@ -12,6 +12,7 @@ from query_data import upload_articles_to_bigquery,fetch_articles_by_type, store
 from enhance_content import generate_news_digest
 from dotenv import load_dotenv
 import os
+from send_weekly_digest import send_digest_email
 
 load_dotenv()
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
@@ -67,19 +68,26 @@ def main():
         print("Articles saved to JSON")
 
         upload_articles_to_bigquery(all_articles)
-
+        print("Raw Articles uploaded to BigQuery")
+        
+        print('Fetching articles from BigQuery to enhance them...')
         featured_articles = fetch_articles_by_type("featured")
         regular_articles = fetch_articles_by_type("regular")
 
         if not (featured_articles or regular_articles):
             print("No articles found for today.")
             return
-
+        print('Generating weekly AI News...')
         digest = generate_news_digest(featured_articles, regular_articles)
+
         print("\nDaily Digest:\n")
         print(digest)
-        print('Storing data to bigquery: \n')
+        print('Storing digest data to bigquery... \n')
         store_digest(digest)
+        print("Digest stored in BigQuery!!")
+
+        send_digest_email(digest)
+        
     finally:
         driver.quit()
 
