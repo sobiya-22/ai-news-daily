@@ -66,3 +66,31 @@ def fetch_enhanced_news():
             "news_date": row.news_date.isoformat(),
             "generated_news": row.generated_news
         } for row in results]
+
+
+from datetime import datetime
+
+def upload_subscriber_email(email):
+    table_id = f"{PROJECT_ID}.{DATASET_ID}.subscribers"
+    data = [{
+        "email": email,
+        "subscribed_at": datetime.now().isoformat()
+    }]
+    
+    job_config = bigquery.LoadJobConfig(
+        write_disposition="WRITE_APPEND",
+        source_format=bigquery.SourceFormat.NEWLINE_DELIMITED_JSON
+    )
+
+    try:
+        job = bq_client.load_table_from_json(data, table_id, job_config=job_config)
+        job.result() 
+        return {
+            "success": True,
+            "message": f"{email} subscribed successfully!"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"❌ Failed to subscribe {email}: {e}"
+        }

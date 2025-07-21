@@ -8,11 +8,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 # from config import VENTUREBEAT_AI_URL
-from query_data import upload_articles_to_bigquery,fetch_articles_by_type, store_digest
-from enhance_content import generate_news_digest
+from services.query_data import upload_articles_to_bigquery,fetch_articles_by_type, store_digest
+from services.enhance_content import generate_news_digest
 from dotenv import load_dotenv
 import os
-from send_weekly_digest import send_digest_email
+from services.send_weekly_digest import send_digest_email
 
 load_dotenv()
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
@@ -87,7 +87,7 @@ def main():
         print("Digest stored in BigQuery!!")
 
         send_digest_email(digest)
-        
+
     finally:
         driver.quit()
 

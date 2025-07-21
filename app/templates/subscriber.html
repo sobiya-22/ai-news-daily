@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscribe to AI News</title>
+  <style>
+    :root {
+      --primary-color: #4a6fa5;
+      --secondary-color: #166088;
+      --accent-color: #4fc3f7;
+      --error-color: #e74c3c;
+      --success-color: #2ecc71;
+      --text-color: #333;
+      --light-color: #f8f9fa;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: #f5f7fa;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    
+    h2 {
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input[type="email"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: border 0.3s;
+    }
+    
+    input[type="email"]:focus {
+      border-color: var(--accent-color);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.2);
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+      font-weight: 500;
+    }
+    
+    button:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .message {
+      padding: 0.75rem;
+      border-radius: 5px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    
+    .error {
+      background-color: #fdecea;
+      color: var(--error-color);
+      border: 1px solid #f5c6cb;
+      display: block;
+    }
+    
+    .success {
+      background-color: #e8f5e9;
+      color: var(--success-color);
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+    
+    .disclaimer {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Subscribe to our Weekly AI Digest</h2>
+    
+    <!-- Message area for errors/success -->
+    <div id="message" class="message"></div>
+    
+    <form id="subscribeForm" method="POST" action="/subscribe">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          required 
+          placeholder="Enter your email address" 
+        />
+      </div>
+      
+      <button type="submit">Subscribe</button>
+    </form>
+    
+    <p class="disclaimer">
+      We respect your privacy. Unsubscribe at any time.
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('subscribeForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const formData = new FormData(form);
+      const messageEl = document.getElementById('message');
+      
+      // Clear previous messages
+      messageEl.className = 'message';
+      messageEl.textContent = '';
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          messageEl.className = 'message success';
+          messageEl.textContent = data.message || 'Subscription successful! Thank you.';
+          form.reset();
+        } else {
+          messageEl.className = 'message error';
+          messageEl.textContent = data.message || 'There was an error with your subscription.';
+        }
+      })
+      .catch(error => {
+        messageEl.className = 'message error';
+        messageEl.textContent = 'There was a problem with your submission. Please try again.';
+        console.error('Error:', error);
+      });
+    });
+    
+    // Check for URL parameters to show messages on page load (for non-JS fallback)
+    window.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+      const isError = urlParams.get('error') === '1';
+      
+      if (message) {
+        const messageEl = document.getElementById('message');
+        messageEl.className = isError ? 'message error' : 'message success';
+        messageEl.textContent = decodeURIComponent(message);
+      }
+    });
+  </script>
+</body>
+</html>
