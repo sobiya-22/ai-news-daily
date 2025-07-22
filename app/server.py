@@ -1,11 +1,11 @@
 from flask import Flask, request, render_template, jsonify
 from services.query_data import upload_subscriber_email
 
-app = Flask(__name__, template_folder="templates")  # 'templates' is inside 'app'
+app = Flask(__name__, template_folder="templates") 
 
 @app.route("/", methods=["GET"])
 def home():
-    return render_template("subscriber.html")  # Flask will automatically look inside 'templates/'
+    return render_template("subscriber.html")
 
 @app.route("/subscribe", methods=["POST"])
 def subscribe():
