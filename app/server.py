@@ -1,4 +1,7 @@
 from flask import Flask, request, render_template, jsonify
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from services.query_data import upload_subscriber_email
 
 app = Flask(__name__, template_folder="templates") 
